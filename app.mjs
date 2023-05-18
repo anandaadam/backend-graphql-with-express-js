@@ -5,6 +5,9 @@ import mongoose from "mongoose";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import __dirname from "./utils/path.mjs";
+import { graphqlHTTP } from "express-graphql";
+import graphqlSchema from "./graphql/schema.mjs";
+import graphqlResolver from "./graphql/resolvers.mjs";
 
 const app = express();
 
@@ -42,8 +45,27 @@ app.use((req, res, next) => {
     "GET, POST, PUT, PATCH, DELETE"
   );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") return res.sendStatus(200);
   next();
 });
+
+app.use(
+  "/graphql",
+  graphqlHTTP({
+    schema: graphqlSchema,
+    rootValue: graphqlResolver,
+    graphiql: true,
+    formatError(error) {
+      if (!error.originalError) return error;
+
+      const data = error.originalError.data;
+      const message = error.message || "Error occured";
+      const code = error.originalError.code || 500;
+
+      return { message: message, status: code, data: data };
+    },
+  })
+);
 
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;
