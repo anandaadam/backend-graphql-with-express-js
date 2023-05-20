@@ -8,6 +8,7 @@ import __dirname from "./utils/path.mjs";
 import { graphqlHTTP } from "express-graphql";
 import graphqlSchema from "./graphql/schema.mjs";
 import graphqlResolver from "./graphql/resolvers.mjs";
+import isAuth from "./middleware/isAuth.mjs";
 
 const app = express();
 
@@ -48,6 +49,8 @@ app.use((req, res, next) => {
   if (req.method === "OPTIONS") return res.sendStatus(200);
   next();
 });
+
+app.use(isAuth);
 
 app.use(
   "/graphql",
