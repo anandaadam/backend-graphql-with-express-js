@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import validator from "validator";
 import { UserModel } from "../models/UserModel.mjs";
 import { PostModel } from "../models/FeedModel.mjs";
+import clearImage from "../utils/clearImage.mjs";
 
 export default {
   createUser: async function ({ userInput }, req) {
@@ -225,5 +226,32 @@ export default {
       createdAt: updatePost.createdAt.toISOString(),
       updatedAt: updatePost.updatedAt.toISOString(),
     };
+  },
+
+  deletePost: async function ({ id }, req) {
+    if (!req.isAuth) {
+      const error = new Error("No Autheticated");
+      error.code = 401;
+      throw error;
+    }
+
+    const post = await PostModel.findById(id);
+    if (!post) {
+      const error = new Error("No post found!");
+      error.code = 404;
+      throw error;
+    }
+    if (post.creator.toString() !== req.userId.toString()) {
+      const error = new Error("No authorized");
+      error.code = 401;
+      throw error;
+    }
+
+    clearImage(post.imageUrl);
+    await PostModel.findByIdAndRemove(id);
+    const user = await UserModel.findById(req.userId);
+    user.posts.pull(id);
+    await user.save();
+    return true;
   },
 };

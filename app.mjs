@@ -11,6 +11,7 @@ import graphqlSchema from "./graphql/schema.mjs";
 import graphqlResolver from "./graphql/resolvers.mjs";
 import isAuth from "./middleware/isAuth.mjs";
 import { clear } from "console";
+import clearImage from "./utils/clearImage.mjs";
 
 const app = express();
 
@@ -63,12 +64,10 @@ app.put("/post-image", (req, res, next) => {
   if (!req.file) return res.status(200).json({ message: "No file provided!" });
   if (req.body.oldPath) clearImage(req.body.oldPath);
 
-  return res
-    .status(201)
-    .json({
-      message: "File stored!",
-      filePath: req.file.path.replace("\\", "/"),
-    });
+  return res.status(201).json({
+    message: "File stored!",
+    filePath: req.file.path.replace("\\", "/"),
+  });
 });
 
 app.use(
@@ -105,10 +104,3 @@ mongoose
     app.listen(3001);
   })
   .catch((error) => console.log(error));
-
-const clearImage = (filePath) => {
-  filePath = path.join(__dirname, "../", filePath);
-  fs.unlink(filePath, (error) => {
-    console.log(error);
-  });
-};
