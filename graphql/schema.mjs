@@ -1,6 +1,11 @@
 import { buildSchema } from "graphql";
 
 const schema = buildSchema(`
+    type PostData {
+        posts: [Post!]!
+        totalPosts: Int!
+    }
+
     type Post {
         _id: ID!
         title: String!
@@ -41,6 +46,7 @@ const schema = buildSchema(`
 
     type RootQuery {
         login(email: String!, password: String!): AuthData!
+        posts: PostData!
     }
 
     type RootMutation {

@@ -120,4 +120,29 @@ export default {
       updatedAt: createdPost.updatedAt.toISOString(),
     };
   },
+
+  posts: async function (args, req) {
+    if (!req.isAuth) {
+      const error = new Error("No Autheticated");
+      error.code = 401;
+      throw error;
+    }
+
+    const totalPosts = await PostModel.find().countDocuments();
+    const posts = await PostModel.find()
+      .sort({ createdAt: -1 })
+      .populate("creator");
+
+    return {
+      posts: posts.map((post) => {
+        return {
+          ...post._doc,
+          _id: post._id,
+          createdAt: post.createdAt.toISOString(),
+          updatedAt: post.updatedAt.toISOString(),
+        };
+      }),
+      totalPosts,
+    };
+  },
 };
