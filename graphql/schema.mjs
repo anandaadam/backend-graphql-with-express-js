@@ -32,6 +32,10 @@ const schema = buildSchema(`
         userId: String!
     }
 
+    type Status {
+        status: String!
+    }
+
     input UserInputData {
         email: String!
         name: String!
@@ -44,10 +48,15 @@ const schema = buildSchema(`
         imageUrl: String!
     }
 
+    input StatusInputData {
+        status: String!
+    }
+
     type RootQuery {
         login(email: String!, password: String!): AuthData!
         posts(page: Int): PostData!
         post(id: ID!): Post!
+        status: Status!
     }
 
     type RootMutation {
@@ -55,6 +64,7 @@ const schema = buildSchema(`
         createPost(postInput: PostInputData): Post!
         updatePost(id: ID!, postInput: PostInputData): Post!
         deletePost(id: ID!): Boolean!
+        updateStatus(statusInput: StatusInputData): Status!
     }
 
     schema {

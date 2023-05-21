@@ -254,4 +254,29 @@ export default {
     await user.save();
     return true;
   },
+
+  status: async function (args, req) {
+    if (!req.isAuth) {
+      const error = new Error("No Autheticated");
+      error.code = 401;
+      throw error;
+    }
+
+    const user = await UserModel.findById(req.userId);
+    return { status: user.status };
+  },
+
+  updateStatus: async function ({ statusInput }, req) {
+    if (!req.isAuth) {
+      const error = new Error("No Autheticated");
+      error.code = 401;
+      throw error;
+    }
+
+    const user = await UserModel.findById(req.userId);
+    user.status = statusInput.status;
+    await user.save();
+
+    return { status: user.status };
+  },
 };
